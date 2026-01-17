@@ -5,65 +5,46 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
-import { useToast } from '@/hooks/use-toast';
 
 interface AuthProps {
   onAuthSuccess: (user: { name: string; role: 'buyer' | 'seller' }) => void;
 }
 
 const Auth = ({ onAuthSuccess }: AuthProps) => {
-  const { toast } = useToast();
   const [buyerForm, setBuyerForm] = useState({ firstName: '', lastName: '' });
   const [sellerForm, setSellerForm] = useState({ firstName: '', lastName: '', code: '' });
+  const [error, setError] = useState('');
 
   const handleBuyerRegister = (e: React.FormEvent) => {
     e.preventDefault();
     if (!buyerForm.firstName || !buyerForm.lastName) {
-      toast({
-        title: 'Ошибка',
-        description: 'Заполните все поля',
-        variant: 'destructive'
-      });
+      setError('Заполните все поля');
       return;
     }
     
+    setError('');
     onAuthSuccess({ 
       name: `${buyerForm.firstName} ${buyerForm.lastName}`, 
       role: 'buyer' 
-    });
-    toast({
-      title: 'Добро пожаловать! 🎉',
-      description: 'Вы успешно зарегистрировались как покупатель'
     });
   };
 
   const handleSellerRegister = (e: React.FormEvent) => {
     e.preventDefault();
     if (!sellerForm.firstName || !sellerForm.lastName || !sellerForm.code) {
-      toast({
-        title: 'Ошибка',
-        description: 'Заполните все поля',
-        variant: 'destructive'
-      });
+      setError('Заполните все поля');
       return;
     }
 
     if (sellerForm.code !== 'EasyLife') {
-      toast({
-        title: 'Неверный код',
-        description: 'Проверьте правильность введенного кода доступа',
-        variant: 'destructive'
-      });
+      setError('Неверный код доступа. Введите: EasyLife');
       return;
     }
 
+    setError('');
     onAuthSuccess({ 
       name: `${sellerForm.firstName} ${sellerForm.lastName}`, 
       role: 'seller' 
-    });
-    toast({
-      title: 'Поздравляем! 🚀',
-      description: 'Вы получили доступ к инструментам продавца'
     });
   };
 
@@ -101,6 +82,12 @@ const Auth = ({ onAuthSuccess }: AuthProps) => {
               </TabsTrigger>
             </TabsList>
 
+            {error && (
+              <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm animate-fade-in">
+                {error}
+              </div>
+            )}
+
             <TabsContent value="buyer">
               <form onSubmit={handleBuyerRegister} className="space-y-4">
                 <div className="space-y-2">
@@ -109,7 +96,10 @@ const Auth = ({ onAuthSuccess }: AuthProps) => {
                     id="buyer-firstname"
                     placeholder="Введите ваше имя"
                     value={buyerForm.firstName}
-                    onChange={(e) => setBuyerForm({ ...buyerForm, firstName: e.target.value })}
+                    onChange={(e) => {
+                      setBuyerForm({ ...buyerForm, firstName: e.target.value });
+                      setError('');
+                    }}
                     className="bg-background/50"
                   />
                 </div>
@@ -120,7 +110,10 @@ const Auth = ({ onAuthSuccess }: AuthProps) => {
                     id="buyer-lastname"
                     placeholder="Введите вашу фамилию"
                     value={buyerForm.lastName}
-                    onChange={(e) => setBuyerForm({ ...buyerForm, lastName: e.target.value })}
+                    onChange={(e) => {
+                      setBuyerForm({ ...buyerForm, lastName: e.target.value });
+                      setError('');
+                    }}
                     className="bg-background/50"
                   />
                 </div>
@@ -140,7 +133,10 @@ const Auth = ({ onAuthSuccess }: AuthProps) => {
                     id="seller-firstname"
                     placeholder="Введите ваше имя"
                     value={sellerForm.firstName}
-                    onChange={(e) => setSellerForm({ ...sellerForm, firstName: e.target.value })}
+                    onChange={(e) => {
+                      setSellerForm({ ...sellerForm, firstName: e.target.value });
+                      setError('');
+                    }}
                     className="bg-background/50"
                   />
                 </div>
@@ -151,7 +147,10 @@ const Auth = ({ onAuthSuccess }: AuthProps) => {
                     id="seller-lastname"
                     placeholder="Введите вашу фамилию"
                     value={sellerForm.lastName}
-                    onChange={(e) => setSellerForm({ ...sellerForm, lastName: e.target.value })}
+                    onChange={(e) => {
+                      setSellerForm({ ...sellerForm, lastName: e.target.value });
+                      setError('');
+                    }}
                     className="bg-background/50"
                   />
                 </div>
@@ -163,7 +162,10 @@ const Auth = ({ onAuthSuccess }: AuthProps) => {
                     type="password"
                     placeholder="Введите код EasyLife"
                     value={sellerForm.code}
-                    onChange={(e) => setSellerForm({ ...sellerForm, code: e.target.value })}
+                    onChange={(e) => {
+                      setSellerForm({ ...sellerForm, code: e.target.value });
+                      setError('');
+                    }}
                     className="bg-background/50"
                   />
                   <p className="text-xs text-muted-foreground">
